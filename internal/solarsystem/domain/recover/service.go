@@ -7,8 +7,6 @@ import (
 	"github.com/fahrurben/solar-system-data/internal/solarsystem/domain/physicalcharateristic"
 	"github.com/pkg/errors"
 	"io"
-	"log"
-	"os"
 	"strconv"
 )
 
@@ -30,18 +28,18 @@ func NewService(bodyRepository body.Repository, orbitalRepository orbitalparamet
 	}
 }
 
-func (s *ServiceImpl) Recover(bodyCsvPath string, orbitalCsvPath string, physicalCsvPath string) error {
-	arrBody, err := getDataFromFileReader(bodyCsvPath, "Body")
+func (s *ServiceImpl) Recover(bodyFile io.Reader, orbitalFile io.Reader, physicalFile io.Reader) error {
+	arrBody, err := getDataFromFileReader(bodyFile, "Body")
 	if err != nil {
 		return err
 	}
 
-	arrOrbital, err := getDataFromFileReader(orbitalCsvPath, "OrbitalParameters")
+	arrOrbital, err := getDataFromFileReader(orbitalFile, "OrbitalParameters")
 	if err != nil {
 		return err
 	}
 
-	arrPhysical, err := getDataFromFileReader(physicalCsvPath, "PhysicalParameters")
+	arrPhysical, err := getDataFromFileReader(physicalFile, "PhysicalParameters")
 	if err != nil {
 		return err
 	}
@@ -94,12 +92,7 @@ func (s *ServiceImpl) Recover(bodyCsvPath string, orbitalCsvPath string, physica
 	return nil
 }
 
-func getDataFromFileReader(csvPath string, modelType string) ([]any, error) {
-	csvFile, err := os.Open(csvPath)
-	if err != nil {
-		log.Fatalln("Couldn't open the csv file", err)
-	}
-
+func getDataFromFileReader(csvFile io.Reader, modelType string) ([]any, error) {
 	csvReader := csv.NewReader(csvFile)
 	var arrData []any
 

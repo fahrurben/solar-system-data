@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"log"
+	"os"
 	"testing"
 )
 
@@ -67,6 +68,22 @@ func TestRecover(t *testing.T) {
 	truncateDatabase()
 
 	serviceImpl := NewService(bodyRepository, orbitalRepository, physicalRepository)
-	err := serviceImpl.Recover("./testfiles/body.csv", "./testfiles/orbital.csv", "./testfiles/physical.csv")
+
+	bodyFile, err := os.Open("./testfiles/body.csv")
+	if err != nil {
+		log.Fatalln("Couldn't open the csv file", err)
+	}
+
+	orbitalFile, err := os.Open("./testfiles/orbital.csv")
+	if err != nil {
+		log.Fatalln("Couldn't open the csv file", err)
+	}
+
+	physicalFile, err := os.Open("./testfiles/physical.csv")
+	if err != nil {
+		log.Fatalln("Couldn't open the csv file", err)
+	}
+
+	err = serviceImpl.Recover(bodyFile, orbitalFile, physicalFile)
 	assert.Nil(t, err)
 }
