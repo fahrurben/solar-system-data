@@ -1,4 +1,4 @@
-package domain
+package body
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ var repository *RepositoryImpl
 var mysql *sqlx.DB
 
 func init() {
-	LoadConfig("../../../configs/")
+	LoadConfig("../../../../configs/")
 	var err error
 	mysql, err = db.New(viper.GetString("DATABASE_URL"))
 	if err != nil {
@@ -39,6 +39,16 @@ func init() {
 
 func truncateDatabase() error {
 	_, err := mysql.Exec("truncate table body")
+	if err != nil {
+		log.Fatal(fmt.Errorf("fatal: %+v", err))
+	}
+
+	_, err = mysql.Exec("truncate table physical_data")
+	if err != nil {
+		log.Fatal(fmt.Errorf("fatal: %+v", err))
+	}
+
+	_, err = mysql.Exec("truncate table orbital_parameters")
 	if err != nil {
 		log.Fatal(fmt.Errorf("fatal: %+v", err))
 	}
@@ -60,27 +70,8 @@ func TestCreateBody(t *testing.T) {
 		Moons:       1,
 	}
 
-	_, err = repository.CreateBody(body)
+	_, err = repository.Create(body)
 	if err != nil {
 		assert.Fail(t, "Create body failed")
-	}
-}
-
-func TestCreatePhysicalCharacteristic(t *testing.T) {
-	physicalCharacteristic := PhysicalCharacteristic{
-		Id:             1,
-		BodyId:         1,
-		Density:        1,
-		Gravity:        1,
-		MassValue:      1,
-		MassExponent:   1,
-		VolumeValue:    1,
-		VolumeExponent: 1,
-	}
-
-	_, err := repository.CreatePhysicalCharacteristic(physicalCharacteristic)
-	if err != nil {
-		log.Fatal(fmt.Errorf("fatal: %+v", err))
-		assert.Fail(t, "Create Physical Characteristic failed")
 	}
 }
